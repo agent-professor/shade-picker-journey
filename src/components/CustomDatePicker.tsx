@@ -27,6 +27,11 @@ export function CustomDatePicker({ date, onDateChange }: DatePickerProps) {
     new Date().getFullYear() - 5 + i
   );
 
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
   const handleYearSelect = (year: string) => {
     if (date) {
       const newDate = new Date(date.setFullYear(parseInt(year)));
@@ -34,6 +39,19 @@ export function CustomDatePicker({ date, onDateChange }: DatePickerProps) {
     } else {
       const newDate = new Date();
       newDate.setFullYear(parseInt(year));
+      onDateChange?.(newDate);
+    }
+  };
+
+  const handleMonthSelect = (monthName: string) => {
+    if (date) {
+      const monthIndex = months.indexOf(monthName);
+      const newDate = new Date(date.setMonth(monthIndex));
+      onDateChange?.(newDate);
+    } else {
+      const monthIndex = months.indexOf(monthName);
+      const newDate = new Date();
+      newDate.setMonth(monthIndex);
       onDateChange?.(newDate);
     }
   };
@@ -53,12 +71,27 @@ export function CustomDatePicker({ date, onDateChange }: DatePickerProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 animate-calendar-in" align="start">
-        <div className="p-3 border-b">
+        <div className="p-3 border-b flex gap-2">
+          <Select
+            value={date ? months[date.getMonth()] : months[new Date().getMonth()]}
+            onValueChange={handleMonthSelect}
+          >
+            <SelectTrigger className="w-[130px]">
+              <SelectValue placeholder="Select month" />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((month) => (
+                <SelectItem key={month} value={month}>
+                  {month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select
             value={date ? date.getFullYear().toString() : new Date().getFullYear().toString()}
             onValueChange={handleYearSelect}
           >
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[100px]">
               <SelectValue placeholder="Select year" />
             </SelectTrigger>
             <SelectContent>
