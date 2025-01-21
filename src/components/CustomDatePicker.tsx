@@ -4,6 +4,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -23,8 +24,11 @@ interface DatePickerProps {
 }
 
 export function CustomDatePicker({ date, onDateChange }: DatePickerProps) {
-  const years = Array.from({ length: 10 }, (_, i) => 
-    new Date().getFullYear() - 5 + i
+  const [inputValue, setInputValue] = React.useState("");
+
+  // Generate 100 years (50 before and 50 after current year)
+  const years = Array.from({ length: 100 }, (_, i) => 
+    new Date().getFullYear() - 50 + i
   );
 
   const months = [
@@ -56,18 +60,40 @@ export function CustomDatePicker({ date, onDateChange }: DatePickerProps) {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+
+    // Try to parse the date
+    const parsedDate = new Date(value);
+    if (parsedDate instanceof Date && !isNaN(parsedDate.getTime())) {
+      onDateChange?.(parsedDate);
+    }
+  };
+
+  React.useEffect(() => {
+    if (date) {
+      setInputValue(format(date, "PPP"));
+    }
+  }, [date]);
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
           className={cn(
-            "w-[280px] justify-start text-left font-normal",
+            "w-[280px] justify-between text-left font-normal",
             !date && "text-muted-foreground"
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          <Input
+            value={inputValue}
+            onChange={handleInputChange}
+            placeholder="Enter date..."
+            className="border-0 p-0 focus-visible:ring-0"
+          />
+          <CalendarIcon className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 animate-calendar-in" align="start">
