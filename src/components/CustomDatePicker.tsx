@@ -9,6 +9,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DatePickerProps {
   date?: Date;
@@ -16,6 +23,21 @@ interface DatePickerProps {
 }
 
 export function CustomDatePicker({ date, onDateChange }: DatePickerProps) {
+  const years = Array.from({ length: 10 }, (_, i) => 
+    new Date().getFullYear() - 5 + i
+  );
+
+  const handleYearSelect = (year: string) => {
+    if (date) {
+      const newDate = new Date(date.setFullYear(parseInt(year)));
+      onDateChange?.(newDate);
+    } else {
+      const newDate = new Date();
+      newDate.setFullYear(parseInt(year));
+      onDateChange?.(newDate);
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -31,6 +53,23 @@ export function CustomDatePicker({ date, onDateChange }: DatePickerProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 animate-calendar-in" align="start">
+        <div className="p-3 border-b">
+          <Select
+            value={date ? date.getFullYear().toString() : new Date().getFullYear().toString()}
+            onValueChange={handleYearSelect}
+          >
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Select year" />
+            </SelectTrigger>
+            <SelectContent>
+              {years.map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <Calendar
           mode="single"
           selected={date}
